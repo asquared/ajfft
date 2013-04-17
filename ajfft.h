@@ -29,11 +29,12 @@
 template <typename T>
 class FFT {
 	public:
-		enum direction { FORWARD, REVERSE };
-		FFT(size_t sz, direction d = FORWARD);
+		enum direction { FORWARD, INVERSE };
+		FFT(size_t sz, direction dir = FORWARD);
 		~FFT( );
 		
 		void compute(std::complex<T> *dst, const T *src);
+		void compute(std::complex<T> *dst, const std::complex<T> *src);
 	private:
 		/* most FFT descriptions call this W_n(k) */
 		std::complex<T> *twiddles;
@@ -50,10 +51,11 @@ class FFT {
 		void bfly(std::complex<T> &u, std::complex<T> &b, size_t t);
 		void work(std::complex<T> *a, size_t n, size_t s);
 		void copy_in(std::complex<T> *dst, const T *src);
+		void copy_in(std::complex<T> *dst, const std::complex<T> *src);
 };
 
 template <typename T>
-FFT<T>::FFT(size_t sz, direction d) {
+FFT<T>::FFT(size_t sz, direction dir) {
 	/* obtain pi in the type we are using */
 	const T pi = std::arg(std::complex<T>(T(-1), T(0)));
 
@@ -69,7 +71,11 @@ FFT<T>::FFT(size_t sz, direction d) {
 
 	/* compute all twiddles */
 	for (size_t i = 0; i < sz; i++) {
-		angle = -(T(2) * pi * T(i) / T(sz));
+		if (dir == FORWARD) {
+			angle = -(T(2) * pi * T(i) / T(sz));
+		} else {
+			angle = T(2) * pi * T(i) / T(sz);
+		}
 		twiddles[i] = std::polar<T>(T(1), angle);
 	}
 
@@ -134,7 +140,6 @@ void FFT<T>::work(std::complex<T> *a, size_t n, size_t s) {
 	}
 }
 
-
 template <typename T>
 void FFT<T>::copy_in(std::complex<T> *dst, const T *src) {
 	for (size_t i = 0; i < size; i++) {
@@ -143,7 +148,20 @@ void FFT<T>::copy_in(std::complex<T> *dst, const T *src) {
 }
 
 template <typename T>
+void FFT<T>::copy_in(std::complex<T> *dst, const std::complex<T> *src) {
+	for (size_t i = 0; i < size; i++) {
+		dst[bitrev[i]] = src[i];
+	}
+}
+
+template <typename T>
 void FFT<T>::compute(std::complex<T> *dst, const T *src) {
+	copy_in(dst, src);
+	work(dst, size, 1);
+}
+
+template <typename T>
+void FFT<T>::compute(std::complex<T> *dst, const std::complex<T> *src) {
 	copy_in(dst, src);
 	work(dst, size, 1);
 }
