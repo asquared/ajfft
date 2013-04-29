@@ -23,6 +23,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef AJFFT_H
+#define AJFFT_H
+
 #include <complex>
 #include <stddef.h>
 
@@ -166,3 +169,4 @@ void FFT<T>::compute(std::complex<T> *dst, const std::complex<T> *src) {
 	work(dst, size, 1);
 }
 
+#endif
