@@ -4,7 +4,8 @@ I wrote this because of some issues I have with FFTW. For one, it's difficult
 to change the FFT precision without going around and changing the names
 of a whole bunch of function calls. It doesn't play nice with std::complex.
 And the license is a bit difficult if you apply GPL special exceptions to
-the code you're linking against.
+the code you're linking against. (update: fftw does in fact correctly handle
+std::complex arrays, but the license is still an issue for me.)
 
 Note: This is a radix-2 FFT only, meaning that your input/output size must
 be a power of 2. If not, bad things are currently likely to happen.
